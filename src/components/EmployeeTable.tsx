@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Trash2, Edit } from 'lucide-react';
 import { Employee } from '../types/Employee';
 
@@ -13,7 +13,7 @@ interface EmployeeTableProps {
   onEditEmployee: (employee: Employee) => void;
 }
 
-const EmployeeTable: React.FC<EmployeeTableProps> = ({ 
+const EmployeeTable: React.FC<EmployeeTableProps> = memo(({ 
   employees, 
   loading, 
   isAdmin, 
@@ -54,7 +54,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+      <div className="flex-1 bg-white rounded-lg shadow-sm border border-gray-200 p-8">
         <div className="flex items-center justify-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           <span className="ml-3 text-gray-600">Loading employees...</span>
@@ -64,13 +64,13 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b border-gray-200">
+    <div className="flex flex-col bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="flex-1 overflow-x-auto">
+        <table className="w-full min-w-max">
+          <thead className="bg-gray-50 border-b border-gray-200 sticky top-0">
             <tr>
               {isAdmin && (
-                <th className="px-6 py-3 text-left">
+                <th className="px-4 py-3 text-left w-12">
                   <input
                     type="checkbox"
                     checked={isAllSelected}
@@ -82,64 +82,62 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                   />
                 </th>
               )}
-
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">
                 PRJ Core Alignment
               </th>
-   
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]">
                 Employee ID
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[150px]">
                 Name
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[140px]">
                 Core Alignment
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">
                 Core Team
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[150px]">
                 Job Title
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">
                 Role Type
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Location
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[200px]">
                 Email
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Hire Date
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Termination Date
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">
                 Vendor
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[130px]">
                 Contact Number
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[150px]">
                 Team Name
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Manager Name
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[140px]">
                 Secondary Team
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[130px]">
+                Manager Name
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]">
+                Status
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">
+                Location
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[110px]">
+                Hire Date
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[130px]">
+                Termination Date
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]">
                 Modified By
               </th>
               {isAdmin && (
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]">
                   Actions
                 </th>
               )}
@@ -167,7 +165,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                   } ${selectedEmployees.includes(employee.emp_id) ? 'bg-blue-50' : ''}`}
                 >
                   {isAdmin && (
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-4 py-3 whitespace-nowrap">
                       <input
                         type="checkbox"
                         checked={selectedEmployees.includes(employee.emp_id)}
@@ -176,84 +174,71 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                       />
                     </td>
                   )}
-
-                  <td className="px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
                     {employee.prj_align}
                   </td>
-
-                  <td className="px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
                     {employee.emp_id}
                   </td>
-                  <td className="px-6 py-2 whitespace-nowrap">
+                  <td className="px-4 py-3 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{employee.resource_name}</div>
                   </td>
-                  <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                     {employee.core_alignment}
                   </td>
-                  <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                     {employee.core_team}
                   </td>
-                  <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                     {employee.job_title}
                   </td>
-                  
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-3 whitespace-nowrap">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleTypeColor(employee.role_type)}`}>
                       {employee.role_type}
                     </span>
                   </td>
-
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(employee.status)}`}>
-                      {employee.status}
-                    </span>
-                  </td>
-
-                  <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900">
-                    {employee.base_location}
-                  </td>
-                  <td className="px-6 py-2 whitespace-nowrap text-sm text-blue-600 hover:text-blue-800">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-blue-600 hover:text-blue-800">
                     <a href={`mailto:${employee.email_id}`}>{employee.email_id}</a>
                   </td>
-                  <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900">
-                    {new Date(employee.hire_date).toLocaleDateString()}
-                  </td>
-
-                  <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900">
-                    {employee.term_date ? new Date(employee.term_date).toLocaleDateString() : '-'}
-                  </td>
-
-                  <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                     {employee.vendor}
                   </td>
-
-                  <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                     <a href={`tel:${employee.contact_number}`} className="text-blue-600 hover:text-blue-800">
                       {employee.contact_number}
                     </a>
                   </td>
-
-                  <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                     {employee.team_name}
                   </td>
-
-                  <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900">
-                    {employee.manager_name}
-                  </td>
-
-                  <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                     {employee.secondary_team}
                   </td>
-
-                  <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                    {employee.manager_name}
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(employee.status)}`}>
+                      {employee.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                    {employee.base_location}
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                    {new Date(employee.hire_date).toLocaleDateString()}
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                    {employee.term_date ? new Date(employee.term_date).toLocaleDateString() : '-'}
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                     <div>{employee.modified_by}</div>
                     <div className="text-xs text-gray-500">
                       {new Date(employee.modified_at).toLocaleDateString()}
                     </div>
                   </td>
-
                   {isAdmin && (
-                    <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => onEditEmployee(employee)}
@@ -280,7 +265,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
       </div>
       
       {employees.length > 0 && (
-        <div className="bg-gray-50 px-6 py-3 border-t border-gray-200">
+        <div className="bg-gray-50 px-6 py-3 border-t border-gray-200 flex-shrink-0">
           <div className="flex items-center justify-between">
             <p className="text-sm text-gray-700">
               Displaying <span className="font-medium">{employees.length}</span> employees
@@ -298,6 +283,8 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
       )}
     </div>
   );
-};
+});
+
+EmployeeTable.displayName = 'EmployeeTable';
 
 export default EmployeeTable;

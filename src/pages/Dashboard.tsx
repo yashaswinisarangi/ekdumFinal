@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import {
   Search,
   RotateCcw,
@@ -11,6 +11,7 @@ import {
 
 import ConfirmationModal from '../components/ConfirmationModal';
 import EditEmployeeModal from '../components/EditEmployeeModal';
+import EditHiringModal from '../components/EditHiringModal';
 import type { Employee } from '../types/Employee';
 import type { Hiring } from '../types/Hiring';
 import { mockEmployees } from '../data/mockData';
@@ -30,20 +31,14 @@ const Dashboard = () => {
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  // Data based on selected page
-  const currentData = selectedPage === 'Hiring' ? mockHiringData : mockEmployees;
-  const startIndex = (currentPage - 1) * entriesPerPage;
-  const endIndex = startIndex + entriesPerPage;
-  const paginatedData = currentData.slice(startIndex, endIndex);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [entriesPerPage, selectedPage]);
-
+  // State management
   const [employees, setEmployees] = useState<Employee[]>(mockEmployees);
-  const [hiringData] = useState<Hiring[]>(mockHiringData);
-  const [isAdmin, setIsAdmin] = useState(true);
+  const [hiringData, setHiringData] = useState<Hiring[]>(mockHiringData);
+  const [isAdmin] = useState(true);
   const [selectedEmployees, setSelectedEmployees] = useState<number[]>([]);
+  const [selectedHiring, setSelectedHiring] = useState<number[]>([]);
+
+  // Modal states
   const [confirmationModal, setConfirmationModal] = useState<{
     isOpen: boolean;
     title: string;
@@ -55,7 +50,8 @@ const Dashboard = () => {
     message: '',
     onConfirm: () => { }
   });
-  const [editModal, setEditModal] = useState<{
+
+  const [editEmployeeModal, setEditEmployeeModal] = useState<{
     isOpen: boolean;
     employee: Employee | null;
   }>({
@@ -63,76 +59,105 @@ const Dashboard = () => {
     employee: null
   });
 
+  const [editHiringModal, setEditHiringModal] = useState<{
+    isOpen: boolean;
+    hiring: Hiring | null;
+    index: number;
+  }>({
+    isOpen: false,
+    hiring: null,
+    index: -1
+  });
+
   const [isAddPersonModal, setIsAddPersonModal] = useState<boolean>(false);
   const [isAddMultipleModal, setIsAddMultipleModal] = useState<boolean>(false);
+
+  // Memoized data calculations
+  const currentData = useMemo(() => 
+    selectedPage === 'Hiring' ? hiringData : employees, 
+    [selectedPage, hiringData, employees]
+  );
+
+  const paginatedData = useMemo(() => {
+    const startIndex = (currentPage - 1) * entriesPerPage;
+    const endIndex = startIndex + entriesPerPage;
+    return currentData.slice(startIndex, endIndex);
+  }, [currentData, currentPage, entriesPerPage]);
 
   const totalEntries = currentData.length;
   const totalPages = Math.ceil(totalEntries / entriesPerPage);
 
-  const handlePrevious = () => {
+  // Reset page when changing entries per page or selected page
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [entriesPerPage, selectedPage]);
+
+  // Event handlers
+  const handlePrevious = useCallback(() => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
-  };
+  }, [currentPage]);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-  };
+  }, [currentPage, totalPages]);
 
-  const handleGo = () => {
+  const handleGo = useCallback(() => {
     const pageNum = parseInt(goToPage);
     if (pageNum >= 1 && pageNum <= totalPages) {
       setCurrentPage(pageNum);
       setGoToPage('');
     }
-  };
+  }, [goToPage, totalPages]);
 
-  const getFilterOptions = () => {
+  const getFilterOptions = useCallback(() => {
     if (selectedPage === 'Hiring') {
       return ['Team', 'Status', 'Hiring Manager'];
     }
     return ['Team', 'Manager'];
-  };
+  }, [selectedPage]);
 
-  const handleAddFilter = () => {
+  const handleAddFilter = useCallback(() => {
     const filterOptions = getFilterOptions();
     if (filterOptions.includes(filter) && value.trim() !== '') {
       const formatted = `${filter} - ${value.trim()}`;
       if (!selectedFilters.includes(formatted)) {
-        setSelectedFilters([...selectedFilters, formatted]);
+        setSelectedFilters(prev => [...prev, formatted]);
         setValue('');
       }
     }
-  };
+  }, [filter, value, selectedFilters, getFilterOptions]);
 
-  const handleRemoveFilter = (val: string) => {
-    setSelectedFilters(selectedFilters.filter((item) => item !== val));
-  };
+  const handleRemoveFilter = useCallback((val: string) => {
+    setSelectedFilters(prev => prev.filter((item) => item !== val));
+  }, []);
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setSelectedFilters([]);
     setFilter('Select');
     setValue('');
     setCurrentPage(1);
     setGoToPage('');
     setEntriesPerPage(50);
-  };
+  }, []);
 
-  const handleSelectEmployee = (empId: number) => {
+  // Employee handlers
+  const handleSelectEmployee = useCallback((empId: number) => {
     setSelectedEmployees(prev =>
       prev.includes(empId)
         ? prev.filter(id => id !== empId)
         : [...prev, empId]
     );
-  };
+  }, []);
 
-  const handleSelectAll = (selected: boolean) => {
+  const handleSelectAllEmployees = useCallback((selected: boolean) => {
     if (selected) {
       setSelectedEmployees(employees.map(emp => emp.emp_id));
     } else {
       setSelectedEmployees([]);
     }
-  };
+  }, [employees]);
 
-  const handleDeleteEmployee = (empId: number) => {
+  const handleDeleteEmployee = useCallback((empId: number) => {
     const employee = employees.find(emp => emp.emp_id === empId);
     setConfirmationModal({
       isOpen: true,
@@ -143,24 +168,70 @@ const Dashboard = () => {
         setSelectedEmployees(prev => prev.filter(id => id !== empId));
       }
     });
-  };
+  }, [employees]);
 
-  const handleEditEmployee = (employee: Employee) => {
-    setEditModal({
+  const handleEditEmployee = useCallback((employee: Employee) => {
+    setEditEmployeeModal({
       isOpen: true,
       employee
     });
-  };
+  }, []);
 
-  const handleSaveEmployee = (updatedEmployee: Employee) => {
+  const handleSaveEmployee = useCallback((updatedEmployee: Employee) => {
     setEmployees(prev =>
       prev.map(emp =>
         emp.emp_id === updatedEmployee.emp_id ? updatedEmployee : emp
       )
     );
-  };
+  }, []);
 
-  const handleExportCSV = () => {
+  // Hiring handlers
+  const handleSelectHiring = useCallback((index: number) => {
+    setSelectedHiring(prev =>
+      prev.includes(index)
+        ? prev.filter(id => id !== index)
+        : [...prev, index]
+    );
+  }, []);
+
+  const handleSelectAllHiring = useCallback((selected: boolean) => {
+    if (selected) {
+      setSelectedHiring(hiringData.map((_, index) => index));
+    } else {
+      setSelectedHiring([]);
+    }
+  }, [hiringData]);
+
+  const handleDeleteHiring = useCallback((index: number) => {
+    const hiring = hiringData[index];
+    setConfirmationModal({
+      isOpen: true,
+      title: 'Delete Hiring Record',
+      message: `Are you sure you want to delete the hiring record for ${hiring?.team}? This action cannot be undone.`,
+      onConfirm: () => {
+        setHiringData(prev => prev.filter((_, i) => i !== index));
+        setSelectedHiring(prev => prev.filter(id => id !== index));
+      }
+    });
+  }, [hiringData]);
+
+  const handleEditHiring = useCallback((hiring: Hiring, index: number) => {
+    setEditHiringModal({
+      isOpen: true,
+      hiring,
+      index
+    });
+  }, []);
+
+  const handleSaveHiring = useCallback((updatedHiring: Hiring, index: number) => {
+    setHiringData(prev =>
+      prev.map((hiring, i) =>
+        i === index ? updatedHiring : hiring
+      )
+    );
+  }, []);
+
+  const handleExportCSV = useCallback(() => {
     if (selectedPage === 'Hiring') {
       const headers = [
         "Team",
@@ -213,16 +284,16 @@ const Dashboard = () => {
         "Core Team",
         "Job Title",
         "Role type",
-        "Status",
-        "Location",
         "Email",
-        "Hire Date",
-        "Termination Date",
         "Vendor",
         "Contact Number",
         "Team Name",
-        "Manager Name",
         "Secondary Team",
+        "Manager Name",
+        "Status",
+        "Location",
+        "Hire Date",
+        "Termination Date",
         "Modified By",
         "Modified at",
       ];
@@ -235,16 +306,16 @@ const Dashboard = () => {
         emp.core_team,
         emp.job_title,
         emp.role_type,
-        emp.status,
-        emp.base_location,
         emp.email_id,
-        emp.hire_date,
-        emp.term_date,
         emp.vendor,
         emp.contact_number,
         emp.team_name,
-        emp.manager_name,
         emp.secondary_team,
+        emp.manager_name,
+        emp.status,
+        emp.base_location,
+        emp.hire_date,
+        emp.term_date,
         emp.modified_by,
         emp.modified_at,
       ]);
@@ -264,10 +335,10 @@ const Dashboard = () => {
       link.click();
       document.body.removeChild(link);
     }
-  };
+  }, [selectedPage, hiringData, employees]);
 
   return (
-    <div className="h-full w-screen p-4">
+    <div className="flex flex-col h-screen w-full p-4">
       <div className="flex md:items-center flex-col gap-2 md:flex-row justify-between mb-4 sm:space-y-0">
         <div className="flex flex-wrap items-center space-x-4">
           <div className="flex flex-col sm:w-auto">
@@ -394,11 +465,17 @@ const Dashboard = () => {
         </div>
       )}
 
-      <div className='my-2'>
+      <div className='flex-1 my-2'>
         {selectedPage === 'Hiring' ? (
           <HiringTable
             hiringData={paginatedData as Hiring[]}
             loading={false}
+            isAdmin={isAdmin}
+            selectedHiring={selectedHiring}
+            onSelectHiring={handleSelectHiring}
+            onSelectAll={handleSelectAllHiring}
+            onDeleteHiring={handleDeleteHiring}
+            onEditHiring={handleEditHiring}
           />
         ) : (
           <EmployeeTable
@@ -407,33 +484,12 @@ const Dashboard = () => {
             isAdmin={isAdmin}
             selectedEmployees={selectedEmployees}
             onSelectEmployee={handleSelectEmployee}
-            onSelectAll={handleSelectAll}
+            onSelectAll={handleSelectAllEmployees}
             onDeleteEmployee={handleDeleteEmployee}
             onEditEmployee={handleEditEmployee}
           />
         )}
       </div>
-
-      <ConfirmationModal
-        isOpen={confirmationModal.isOpen}
-        onClose={() => setConfirmationModal(prev => ({ ...prev, isOpen: false }))}
-        onConfirm={confirmationModal.onConfirm}
-        title={confirmationModal.title}
-        message={confirmationModal.message}
-        confirmText="Delete"
-        cancelText="Cancel"
-        type="danger"
-      />
-
-      <EditEmployeeModal
-        isOpen={editModal.isOpen}
-        onClose={() => setEditModal({ isOpen: false, employee: null })}
-        onSave={handleSaveEmployee}
-        employee={editModal.employee}
-      />
-
-      <AddPersonModal isOpen={isAddPersonModal} onClose={() => setIsAddPersonModal(false)} />
-      <AddMultiple isOpen={isAddMultipleModal} onClose={() => setIsAddMultipleModal(false)} />
 
       <div className="flex md:items-center flex-col gap-2 md:flex-row justify-end">
         <div className="flex items-center space-x-2">
@@ -492,6 +548,36 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      <ConfirmationModal
+        isOpen={confirmationModal.isOpen}
+        onClose={() => setConfirmationModal(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={confirmationModal.onConfirm}
+        title={confirmationModal.title}
+        message={confirmationModal.message}
+        confirmText="Delete"
+        cancelText="Cancel"
+        type="danger"
+      />
+
+      <EditEmployeeModal
+        isOpen={editEmployeeModal.isOpen}
+        onClose={() => setEditEmployeeModal({ isOpen: false, employee: null })}
+        onSave={handleSaveEmployee}
+        employee={editEmployeeModal.employee}
+      />
+
+      <EditHiringModal
+        isOpen={editHiringModal.isOpen}
+        onClose={() => setEditHiringModal({ isOpen: false, hiring: null, index: -1 })}
+        onSave={handleSaveHiring}
+        hiring={editHiringModal.hiring}
+        index={editHiringModal.index}
+      />
+
+      <AddPersonModal isOpen={isAddPersonModal} onClose={() => setIsAddPersonModal(false)} />
+      <AddMultiple isOpen={isAddMultipleModal} onClose={() => setIsAddMultipleModal(false)} />
     </div>
   );
 };

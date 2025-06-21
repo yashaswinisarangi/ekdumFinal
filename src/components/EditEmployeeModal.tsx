@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { X, Save, User } from 'lucide-react';
 import { Employee } from '../types/Employee';
 
@@ -9,7 +9,7 @@ interface EditEmployeeModalProps {
   employee: Employee | null;
 }
 
-const EditEmployeeModal: React.FC<EditEmployeeModalProps> = ({
+const EditEmployeeModal: React.FC<EditEmployeeModalProps> = memo(({
   isOpen,
   onClose,
   onSave,
@@ -157,13 +157,11 @@ const EditEmployeeModal: React.FC<EditEmployeeModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        {/* Background overlay */}
         <div 
           className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
           onClick={onClose}
         />
 
-        {/* Modal panel */}
         <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-6xl sm:w-full sm:p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center">
@@ -185,7 +183,7 @@ const EditEmployeeModal: React.FC<EditEmployeeModalProps> = ({
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Employee ID - Read only */}
-              <div>
+              <div className="flex flex-col">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Employee ID
                 </label>
@@ -198,7 +196,7 @@ const EditEmployeeModal: React.FC<EditEmployeeModalProps> = ({
               </div>
 
               {/* Name */}
-              <div>
+              <div className="flex flex-col">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Name <span className="text-red-500">*</span>
                 </label>
@@ -216,7 +214,7 @@ const EditEmployeeModal: React.FC<EditEmployeeModalProps> = ({
               </div>
 
               {/* Project Alignment */}
-              <div>
+              <div className="flex flex-col">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Project Alignment
                 </label>
@@ -233,7 +231,7 @@ const EditEmployeeModal: React.FC<EditEmployeeModalProps> = ({
               </div>
 
               {/* Core Alignment */}
-              <div>
+              <div className="flex flex-col">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Core Alignment
                 </label>
@@ -250,7 +248,7 @@ const EditEmployeeModal: React.FC<EditEmployeeModalProps> = ({
               </div>
 
               {/* Core Team */}
-              <div>
+              <div className="flex flex-col">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Core Team
                 </label>
@@ -267,7 +265,7 @@ const EditEmployeeModal: React.FC<EditEmployeeModalProps> = ({
               </div>
 
               {/* Job Title */}
-              <div>
+              <div className="flex flex-col">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Job Title <span className="text-red-500">*</span>
                 </label>
@@ -285,7 +283,7 @@ const EditEmployeeModal: React.FC<EditEmployeeModalProps> = ({
               </div>
 
               {/* Role Type */}
-              <div>
+              <div className="flex flex-col">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Role Type
                 </label>
@@ -301,38 +299,8 @@ const EditEmployeeModal: React.FC<EditEmployeeModalProps> = ({
                 </select>
               </div>
 
-              {/* Status */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Status
-                </label>
-                <select
-                  value={formData.status}
-                  onChange={(e) => handleInputChange('status', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Select Status</option>
-                  {statusOptions.map(option => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Location */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Base Location
-                </label>
-                <input
-                  type="text"
-                  value={formData.base_location}
-                  onChange={(e) => handleInputChange('base_location', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
               {/* Email */}
-              <div>
+              <div className="flex flex-col">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Email <span className="text-red-500">*</span>
                 </label>
@@ -349,39 +317,8 @@ const EditEmployeeModal: React.FC<EditEmployeeModalProps> = ({
                 )}
               </div>
 
-              {/* Hire Date */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Hire Date <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="date"
-                  value={formData.hire_date}
-                  onChange={(e) => handleInputChange('hire_date', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.hire_date ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                />
-                {errors.hire_date && (
-                  <p className="mt-1 text-sm text-red-600">{errors.hire_date}</p>
-                )}
-              </div>
-
-              {/* Termination Date */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Termination Date
-                </label>
-                <input
-                  type="date"
-                  value={formData.term_date || ''}
-                  onChange={(e) => handleInputChange('term_date', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
               {/* Vendor */}
-              <div>
+              <div className="flex flex-col">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Vendor
                 </label>
@@ -398,7 +335,7 @@ const EditEmployeeModal: React.FC<EditEmployeeModalProps> = ({
               </div>
 
               {/* Contact Number */}
-              <div>
+              <div className="flex flex-col">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Contact Number <span className="text-red-500">*</span>
                 </label>
@@ -416,7 +353,7 @@ const EditEmployeeModal: React.FC<EditEmployeeModalProps> = ({
               </div>
 
               {/* Team Name */}
-              <div>
+              <div className="flex flex-col">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Team Name
                 </label>
@@ -432,25 +369,8 @@ const EditEmployeeModal: React.FC<EditEmployeeModalProps> = ({
                 </select>
               </div>
 
-              {/* Manager Name */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Manager Name
-                </label>
-                <select
-                  value={formData.manager_name}
-                  onChange={(e) => handleInputChange('manager_name', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Select Manager</option>
-                  {managerOptions.map(option => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </div>
-
               {/* Secondary Team */}
-              <div>
+              <div className="flex flex-col">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Secondary Team
                 </label>
@@ -466,8 +386,86 @@ const EditEmployeeModal: React.FC<EditEmployeeModalProps> = ({
                 </select>
               </div>
 
+              {/* Manager Name */}
+              <div className="flex flex-col">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Manager Name
+                </label>
+                <select
+                  value={formData.manager_name}
+                  onChange={(e) => handleInputChange('manager_name', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select Manager</option>
+                  {managerOptions.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Status */}
+              <div className="flex flex-col">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Status
+                </label>
+                <select
+                  value={formData.status}
+                  onChange={(e) => handleInputChange('status', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select Status</option>
+                  {statusOptions.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Location */}
+              <div className="flex flex-col">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Base Location
+                </label>
+                <input
+                  type="text"
+                  value={formData.base_location}
+                  onChange={(e) => handleInputChange('base_location', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* Hire Date */}
+              <div className="flex flex-col">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Hire Date <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  value={formData.hire_date}
+                  onChange={(e) => handleInputChange('hire_date', e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    errors.hire_date ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                />
+                {errors.hire_date && (
+                  <p className="mt-1 text-sm text-red-600">{errors.hire_date}</p>
+                )}
+              </div>
+
+              {/* Termination Date */}
+              <div className="flex flex-col">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Termination Date
+                </label>
+                <input
+                  type="date"
+                  value={formData.term_date || ''}
+                  onChange={(e) => handleInputChange('term_date', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
               {/* Modified By - Text Input */}
-              <div>
+              <div className="flex flex-col">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Modified By
                 </label>
@@ -501,6 +499,8 @@ const EditEmployeeModal: React.FC<EditEmployeeModalProps> = ({
       </div>
     </div>
   );
-};
+});
+
+EditEmployeeModal.displayName = 'EditEmployeeModal';
 
 export default EditEmployeeModal;
